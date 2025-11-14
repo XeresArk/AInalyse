@@ -60,7 +60,7 @@ public class GeminiService {
             ObjectMapper mapper = new ObjectMapper();
             return ResponseEntity.ok(mapper.readValue(cleanedResponse, ImpactResult.class));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read dependency map: " + request.getDependencyMapJson(), e);
+            throw new RuntimeException("Failed to read dependency map");
         }
     }
 }
