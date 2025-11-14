@@ -1,15 +1,27 @@
 
 package com.ainalyse.service;
 
+import com.ainalyse.dto.ImpactRequest;
+import com.ainalyse.dto.ImpactResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
 import com.google.genai.ResponseStream;
 import com.google.genai.types.GenerateContentResponse;
+
+import java.io.IOException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class GeminiService {
     private final Client client;
+
+    @Autowired
+    private AnalyseService analyseService;
 
     public GeminiService(@Value("${gemini.api.key}") String apiKey) {
         try {
@@ -33,6 +45,22 @@ public class GeminiService {
             return responseText.toString();
         } catch (Exception e) {
             return "Error: " + e.getMessage();
+        }
+    }
+
+    public ResponseEntity<ImpactResult> analyse(@RequestBody ImpactRequest request) {
+        try {
+            String dependencyMapJson = analyseService.loadDependencyMaps().toString();
+            String prompt = analyseService.buildPrompt(request.getDiff(), dependencyMapJson);
+            System.out.println("Prompt sent to Gemini");
+            String response = getGeminiResponse(prompt);
+            System.out.println("Raw Gemini response: " + response);
+            String cleanedResponse = analyseService.cleanAnalyseGeminiResponse(response);
+            System.out.println("Cleaned Gemini response: " + cleanedResponse);
+            ObjectMapper mapper = new ObjectMapper();
+            return ResponseEntity.ok(mapper.readValue(cleanedResponse, ImpactResult.class));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read dependency map: " + request.getDependencyMapJson(), e);
         }
     }
 }

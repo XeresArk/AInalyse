@@ -34,7 +34,8 @@ public class AnalyseService {
         - Consider side effects such as changed read/write patterns or exception behavior
         - Consider orphaned methods or classes as indirectly impacted
         - Assign higher impact scores for changes in widely used methods/classes
-        - Assign a impact score based on number and criticality of impacted elements
+        - Assign an individual and total impact score based on number and criticality of impacted elements
+        - Provide and impact type for each impacted element as Added, Modified, Impacted, or Removed
         - Use the dependency graph to determine all connected downstream impacts
 
         Input:

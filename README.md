@@ -1,3 +1,18 @@
+# GitHub Diff Fetcher
+
+### Endpoint
+`GET /github/diff?owner={owner}&repo={repo}`
+
+Returns the code diff from the latest commit of the specified GitHub repository.
+
+**Example:**
+```
+GET /github/diff?owner=spring-projects&repo=spring-boot
+```
+
+### Implementation
+- `GitHubDiffFetcher.java`: Utility to fetch latest commit SHA and diff from GitHub
+- `GitHubDiffController.java`: REST controller exposing the endpoint
 # AInalyse
 
 A minimal Spring Boot application skeleton for `AInalyse`.
