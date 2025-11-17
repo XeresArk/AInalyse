@@ -7,5 +7,4 @@ public class ImpactElement {
     private String type;
     private String name;
     private String impactType;
-    private String impactScore;
 }

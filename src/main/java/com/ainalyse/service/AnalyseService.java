@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,7 @@ public class AnalyseService {
 
         Goal:
         Given a Git diff and a dependency graph (generated via static analysis),
-        identify all directly and indirectly impacted modules, classes, methods, endpoints,
+        identify all directly and indirectly impacted modules, field, methods
         and calculate an impact score from 0 to 100.
 
         Rules:
@@ -30,13 +31,13 @@ public class AnalyseService {
         - Consider Spring beans and their wiring dependencies
         - Consider controller → service → repository → entity chain
         - Consider changes in method signatures, exceptions, logic, and validations
-        - Consider endpoints exposed by impacted controller methods
         - Consider side effects such as changed read/write patterns or exception behavior
-        - Consider orphaned methods or classes as indirectly impacted
-        - Assign higher impact scores for changes in widely used methods/classes
-        - Assign an individual and total impact score based on number and criticality of impacted elements
-        - Provide and impact type for each impacted element as Added, Modified, Impacted, or Removed
+        - Consider orphaned methods as indirectly impacted
+        - Assign higher impact scores for changes in widely used methods.
+        - Assign total impact score based on number and criticality of impacted elements
+        - Provide and impact type for each impacted element as Added, Modified, Impacted, or Removed only for changed elements
         - Use the dependency graph to determine all connected downstream impacts
+        - Do not send changes that are of type endpoint.
 
         Input:
         ### Diff ###
@@ -48,13 +49,13 @@ public class AnalyseService {
         Output JSON strictly in this format:
         {
           "changedElements": [
-            { "type": "method", "name": "com.example.service.UserService.getUser(Long)" }
+            { "type": "field", "name": "com.example.service.UserService.user", "impactType": "Removed" }
           ],
           "directImpacts": [
-            { "type": "method", "name": "com.example.controller.UserController.getUser(Long)" }
+            { "type": "method", "name": "com.example.service.UserService.getUser(Long)", "impactType": "Modified"}  
           ],
           "indirectImpacts": [
-            { "type": "endpoint", "name": "GET /users/{id}" }
+            { "type": "method", "name": "com.example.controller.UserController.getUser(Long)", "impactType": "Impacted"}
           ],
           "modulesImpacted": [
             "billing-service",
@@ -89,11 +90,12 @@ public class AnalyseService {
     return cleaned;
   }
 
-  public Map<String, String> loadDependencyMaps() {
+  public Map<String, String> loadDependencyMaps(List<String> dependencyMaps) {
       Map<String, String> maps = new HashMap<>();
       try {
           Files.list(Path.of(dependencyMapDir))
                   .filter(path -> path.toString().endsWith(".json"))
+                  .filter(path -> dependencyMaps.contains(path.getFileName().toString().replaceFirst("[.][^.]+$", "").toString()))
                   .forEach(path -> {
                       try {
                           String content = Files.readString(path, StandardCharsets.UTF_8);

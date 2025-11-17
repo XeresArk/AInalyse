@@ -11,4 +11,5 @@ public class ImpactResult {
     private List<String> modulesImpacted;
     private int impactScore;
     private String reasoning;
+    private String repoUrl;
 }

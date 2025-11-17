@@ -1,7 +1,7 @@
 
 package com.ainalyse.service;
 
-import com.ainalyse.dto.ImpactRequest;
+import com.ainalyse.dto.DiffImpactRequest;
 import com.ainalyse.dto.ImpactResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
@@ -48,9 +48,9 @@ public class GeminiService {
         }
     }
 
-    public ResponseEntity<ImpactResult> analyse(@RequestBody ImpactRequest request) {
+    public ResponseEntity<ImpactResult> analyse(@RequestBody DiffImpactRequest request) {
         try {
-            String dependencyMapJson = analyseService.loadDependencyMaps().toString();
+            String dependencyMapJson = analyseService.loadDependencyMaps(request.getDependencyMaps()).toString();
             String prompt = analyseService.buildPrompt(request.getDiff(), dependencyMapJson);
             System.out.println("Prompt sent to Gemini");
             String response = getGeminiResponse(prompt);
@@ -59,7 +59,8 @@ public class GeminiService {
             System.out.println("Cleaned Gemini response: " + cleanedResponse);
             ObjectMapper mapper = new ObjectMapper();
             return ResponseEntity.ok(mapper.readValue(cleanedResponse, ImpactResult.class));
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             throw new RuntimeException("Failed to read dependency map");
         }
     }
