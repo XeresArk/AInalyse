@@ -3,14 +3,10 @@ package com.ainalyse.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
-import java.util.Map;
-
 @Data
 @AllArgsConstructor
-public class SchemaInfoDTO {
+public class TableFetchRequest {
     private String schemaName;
-    private Map<String, List<String>> tables;
-
+    private String tableName;
+    private String columnName;
 }
-

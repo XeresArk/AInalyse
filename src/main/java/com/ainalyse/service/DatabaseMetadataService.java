@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.util.ArrayList;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,5 +37,25 @@ public class DatabaseMetadataService {
               tables.put(tableName, columnNames);
          }
          return new SchemaInfoDTO(schemaName, tables);
+    }
+
+    @Transactional
+    public List performDatabaseImpactAnalysis(String schema, String table, String column) {
+        //Call the procedure asynchronously (fire and forget)
+        if (column == null || column.isEmpty()) {
+             entityManager.createNativeQuery("CALL PR_GET_TABLE_IMPACT(:schema, :table, NULL)")
+                    .setParameter("schema", schema)
+                    .setParameter("table", table)
+                    .executeUpdate();
+        } else {
+             entityManager.createNativeQuery("CALL PR_GET_TABLE_IMPACT(:schema, :table, :column)")
+                    .setParameter("schema", schema)
+                    .setParameter("table", table)
+                    .setParameter("column", column)
+                    .executeUpdate();
+        }
+        //Immediately fetch the latest results from the HACKATHON_SEARCH_RESULT table
+        String sql = "SELECT * FROM HACKATHON_SEARCH_RESULT WHERE run_id = (SELECT MAX(run_id) FROM HACKATHON_SEARCH_RESULT)";
+        return entityManager.createNativeQuery(sql).getResultList();
     }
 }

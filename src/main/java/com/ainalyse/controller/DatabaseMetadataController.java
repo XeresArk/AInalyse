@@ -1,12 +1,10 @@
 package com.ainalyse.controller;
 
 import com.ainalyse.dto.SchemaInfoDTO;
+import com.ainalyse.dto.TableFetchRequest;
 import com.ainalyse.service.DatabaseMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -18,9 +16,19 @@ public class DatabaseMetadataController {
     private DatabaseMetadataService databaseMetadataService;
 
     @GetMapping("/getTableDetails")
-    public ResponseEntity<SchemaInfoDTO> getSchemaDetails() {
-        SchemaInfoDTO schemas = databaseMetadataService.getAllSchemasWithTablesAndColumns();
-        return ResponseEntity.ok(schemas);
+    public SchemaInfoDTO getSchemaDetails() {
+        return databaseMetadataService.getAllSchemasWithTablesAndColumns();
+    }
+
+    @PostMapping("/getDBImpact")
+    public List getImpactResult(@RequestBody TableFetchRequest request) throws SQLException {
+
+        String schema = request.getSchemaName();
+        String table = request.getTableName();
+        String column = (request.getColumnName() == null || request.getColumnName().isEmpty()) ? null : request.getColumnName();
+        //if columnName is null or empty, pass only schema and table
+        return databaseMetadataService.performDatabaseImpactAnalysis(schema, table, column);
+
     }
 }
 
