@@ -1,5 +1,6 @@
 package com.ainalyse.controller;
 
+import com.ainalyse.dto.ImpactResult;
 import com.ainalyse.dto.SchemaInfoDTO;
 import com.ainalyse.dto.TableFetchRequest;
 import com.ainalyse.service.DatabaseMetadataService;
@@ -17,13 +18,13 @@ public class DatabaseMetadataController {
 
     @GetMapping("/getTableDetails")
     public SchemaInfoDTO getSchemaDetails() {
-        return databaseMetadataService.getAllSchemasWithTablesAndColumns();
+        return databaseMetadataService.getTablesAndColumns();
     }
 
     @PostMapping("/getDBImpact")
-    public List getImpactResult(@RequestBody TableFetchRequest request) throws SQLException {
+    public ImpactResult getImpactResult(@RequestBody TableFetchRequest request) throws SQLException {
 
-        String schema = request.getSchemaName();
+        String schema = (request.getSchemaName() == null || request.getSchemaName().isEmpty()) ? "ainalyse" : request.getSchemaName();
         String table = request.getTableName();
         String column = (request.getColumnName() == null || request.getColumnName().isEmpty()) ? null : request.getColumnName();
         //if columnName is null or empty, pass only schema and table
