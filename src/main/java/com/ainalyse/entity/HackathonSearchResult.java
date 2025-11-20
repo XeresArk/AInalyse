@@ -1,9 +1,13 @@
 package com.ainalyse.entity;
 
-import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Data

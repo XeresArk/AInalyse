@@ -13,9 +13,9 @@ public interface ImpactRepository extends JpaRepository<HackathonSearchResult, I
     // Stored Procedure with 3 parameters
     @Procedure(procedureName = "PR_GET_TABLE_IMPACT")
     void callImpactProcedure(
-            @Param("schema") String schema,
-            @Param("table") String table,
-            @Param("column") String column
+            @Param("P_OWNER") String schema,
+            @Param("P_TABLE_NAME") String table,
+            @Param("P_COLUMN_NAME") String column
     );
 
     // Return list of search_desc for the latest run

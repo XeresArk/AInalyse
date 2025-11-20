@@ -1,10 +1,16 @@
 // language: java
 package com.ainalyse.service;
 
-import com.ainalyse.dto.*;
+import com.ainalyse.dto.ColumnInfoInterface;
+import com.ainalyse.dto.ImpactElement;
+import com.ainalyse.dto.ImpactResult;
+import com.ainalyse.dto.SchemaInfoDTO;
+import com.ainalyse.dto.TableNameInterface;
 import com.ainalyse.repository.ImpactRepository;
 import com.ainalyse.repository.MetadataRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
@@ -23,37 +29,32 @@ public class DatabaseMetadataService {
     @Autowired
     private ImpactRepository impactRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     String schemaName = "ainalyse";
     @Transactional
     public SchemaInfoDTO getTablesAndColumns() {
 
         Map<String, List<String>> result = new LinkedHashMap<>();
-
-        List<TableNameInterface> tables = metadataRepository.getTables();
+        List<TableNameInterface> tables = metadataRepository.getTables(schemaName);
 
         for (TableNameInterface table : tables) {
-
-            List<String> columns = metadataRepository.getColumns(table.getTableName())
+            List<String> columns = metadataRepository.getColumns(schemaName, table.getTableName())
                     .stream()
                     .map(ColumnInfoInterface::getColumnName)
                     .toList();
-
             result.put(table.getTableName(), columns);
         }
-
         return new SchemaInfoDTO(schemaName, result);
     }
 
     @Transactional
-    public ImpactResult performDatabaseImpactAnalysis(String schema, String table, String column) {
+    public ResponseEntity<ImpactResult> performDatabaseImpactAnalysis(String schema, String table, String column) {
 
-        // If column is empty/null, pass NULL to procedure
-        String columnValue = (column == null || column.isBlank()) ? null : column;
-
-        impactRepository.callImpactProcedure(schema, table, columnValue);
+        impactRepository.callImpactProcedure(schema, table, column);
 
         List<String> response= impactRepository.findLatestSearchDescList();
-        ImpactResult impactResult = new ImpactResult();
         // Convert List<String> → List<ImpactElement>
         List<ImpactElement> directImpacts = response.stream()
                 .map(desc -> {
@@ -67,6 +68,6 @@ public class DatabaseMetadataService {
         ImpactResult result = new ImpactResult();
         result.setDirectImpacts(directImpacts);
 
-        return result;
+        return ResponseEntity.ok(result);
     }
 }
