@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class TableFetchRequest {
-    private String schemaName;
-    private String tableName;
-    private String columnName;
+    private String schema;
+    private String table;
+    private String column;
 }

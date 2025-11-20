@@ -6,6 +6,7 @@ import com.ainalyse.dto.ImpactElement;
 import com.ainalyse.dto.ImpactResult;
 import com.ainalyse.dto.SchemaInfoDTO;
 import com.ainalyse.dto.TableNameInterface;
+import com.ainalyse.entity.HackathonSearchResult;
 import com.ainalyse.repository.ImpactRepository;
 import com.ainalyse.repository.MetadataRepository;
 
@@ -54,12 +55,13 @@ public class DatabaseMetadataService {
 
         impactRepository.callImpactProcedure(schema, table, column);
 
-        List<String> response= impactRepository.findLatestSearchDescList();
+        List<HackathonSearchResult> response= impactRepository.findLatestSearchDescList();
         // Convert List<String> → List<ImpactElement>
         List<ImpactElement> directImpacts = response.stream()
-                .map(desc -> {
+                .map(row -> {
                     ImpactElement e = new ImpactElement();
-                    e.setName(desc);
+                    e.setType(row.getObjType());
+                    e.setName(row.getSearchDesc());
                     return e;
                 })
                 .toList();
@@ -67,7 +69,8 @@ public class DatabaseMetadataService {
         // Build final ImpactResult
         ImpactResult result = new ImpactResult();
         result.setDirectImpacts(directImpacts);
-
+        result.setImpactScore(null);
+        
         return ResponseEntity.ok(result);
     }
 }

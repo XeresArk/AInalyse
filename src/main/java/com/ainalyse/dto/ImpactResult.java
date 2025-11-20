@@ -9,7 +9,7 @@ public class ImpactResult {
     private List<ImpactElement> directImpacts;
     private List<ImpactElement> indirectImpacts;
     private List<String> modulesImpacted;
-    private int impactScore;
+    private Integer impactScore;
     private String reasoning;
     private String repoUrl;
 }

@@ -15,8 +15,14 @@ import jakarta.persistence.Table;
 public class HackathonSearchResult {
 
     @Id
+    @Column(name = "HSR_ID")
+    private Integer hsrId;
+
     @Column(name = "RUN_ID")
     private Integer runId;
+
+    @Column(name = "OBJ_TYPE")
+    private String objType;
 
     @Column(name = "SEARCH_DESC")
     private String searchDesc;

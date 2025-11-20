@@ -19,10 +19,6 @@ public interface ImpactRepository extends JpaRepository<HackathonSearchResult, I
     );
 
     // Return list of search_desc for the latest run
-    @Query(value = """
-        SELECT search_desc
-        FROM hackathon_search_result
-        WHERE run_id = (SELECT MAX(run_id) FROM hackathon_search_result)
-        """, nativeQuery = true)
-    List<String> findLatestSearchDescList();
+    @Query("Select h from HackathonSearchResult h where h.runId = (Select Max(h2.runId) from HackathonSearchResult h2)")
+    List<HackathonSearchResult> findLatestSearchDescList();
 }

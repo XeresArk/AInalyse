@@ -29,9 +29,9 @@ public class DatabaseController {
 
     @PostMapping("/getDbImpact")
     public ResponseEntity<ImpactResult> getDbImpact(@RequestBody TableFetchRequest request) {
-        String schema = (request.getSchemaName() == null || request.getSchemaName().isEmpty()) ? "ainalyse" : request.getSchemaName();
-        String table = request.getTableName();
-        String column = (request.getColumnName() == null || request.getColumnName().isEmpty()) ? null : request.getColumnName();
+        String schema = (request.getSchema() == null || request.getSchema().isEmpty()) ? "ainalyse" : request.getSchema();
+        String table = request.getTable();
+        String column = (request.getColumn() == null || request.getColumn().isEmpty()) ? null : request.getColumn();
         //if columnName is null or empty, pass only schema and table
         return databaseMetadataService.performDatabaseImpactAnalysis(schema, table, column);
     }
