@@ -95,7 +95,7 @@ public class AnalyseService {
       try {
           Files.list(Path.of(dependencyMapDir))
                   .filter(path -> path.toString().endsWith(".json"))
-                  .filter(path -> dependencyMaps.contains(path.getFileName().toString().replaceFirst("[.][^.]+$", "").toString()))
+                  .filter(path -> dependencyMaps.contains(path.getFileName().toString()))
                   .forEach(path -> {
                       try {
                           String content = Files.readString(path, StandardCharsets.UTF_8);

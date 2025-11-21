@@ -16,7 +16,8 @@ Automated Dependency Mapping: Scans local Java projects (Abstract Syntax Tree pa
  - **Database Impact Analysis:** Tracks changes to database schemas and procedures to identify affected application layers.
  - **Swagger/OpenAPI:** Built-in API documentation for easy testing and integration.
 
-  
+# Architecture
+![AInalyse](AInalyse\AInalyse.jpg)
 
 # 🛠️ Tech Stack
 

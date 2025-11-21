@@ -1,5 +1,10 @@
 package com.ainalyse.service;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +30,22 @@ public class DependencyService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<String> getDependencyMapNames() {
+        File folder = new File(dependencyMapDir);
+
+        if (!folder.exists() || !folder.isDirectory()) {
+            throw new RuntimeException("Folder not found or is not a directory");
+        }
+
+        return Arrays.stream(folder.listFiles())
+                .filter(file -> file.isFile() && file.getName().endsWith(".json"))
+                .map(File::getName)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getServiceNames() {
+        return List.of("EmployeeApp", "DepartmentApp", "DatabaseRepo");
     }
 }
